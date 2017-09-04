@@ -27,7 +27,7 @@
     (pos (pos-pre p) (char->integer c) (pos-suf p)))
   
   (define (current-val p)
-    (integer->char (pos-cur p)))
+    (pos-cur p))
 
   (struct state (input p output) #:transparent)
 
@@ -67,14 +67,14 @@
             [(eq? (car loc) #\-)
              (interp-list (cdr loc) (state input (sub-current p) output))]
             [(eq? (car loc) #\.)
-             (interp-list (cdr loc) (state input p (cons (current-val p) output)))]
+             (interp-list (cdr loc) (state input p (cons (integer->char (current-val p)) output)))]
             [(eq? (car loc) #\,)
              (interp-list (cdr loc) (state (cdr input) (set-current p (car input)) output))]
             [else
              (interp-list (cdr loc) s)])))
   
   (define (repeat body rest s)
-    (if (zero? (char->integer (current-val (state-p s))))
+    (if (zero? (current-val (state-p s)))
         (interp-list rest s)
         (repeat body rest (interp-list body s))))
   
