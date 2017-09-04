@@ -1,5 +1,8 @@
 #lang racket
 
+(define BYTE-MAX 127)
+(define BYTE-MIN -128)
+
 (define (interp code input)
   (struct pos (pre cur suf) #:transparent)
   
@@ -18,10 +21,12 @@
              (cdr (pos-suf p)))))
   
   (define (add-current p)
-    (pos (pos-pre p) (add1 (pos-cur p)) (pos-suf p)))
+    (let ([t (add1 (pos-cur p))])
+      (pos (pos-pre p) (if (> t BYTE-MAX) BYTE-MIN t) (pos-suf p))))
   
   (define (sub-current p)
-    (pos (pos-pre p) (sub1 (pos-cur p)) (pos-suf p)))
+    (let ([t (sub1 (pos-cur p))])
+      (pos (pos-pre p) (if (< t BYTE-MIN) BYTE-MAX t) (pos-suf p))))
   
   (define (set-current p c)
     (pos (pos-pre p) (char->integer c) (pos-suf p)))
